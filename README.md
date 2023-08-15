@@ -1,4 +1,7 @@
 # ATTinyCore **Universal**
+
+*This fork adds the capability of generating debug-friendly binaries, but is otherwise identical to the original core by MCUdude.*
+
 Arduino support for almost every classic tinyAVR device! Supports ATtiny 1634, 2313/4313, 24/44/84, 441/841, 25/45/85, 261/461/861, 87/167, 48/88, 43 and 828. Supports programming vis ISP, Serial (Optiboot - all parts with >4k flash, and all parts with 4k flash for which an 8k version is available) or VUSB (Micronucleus - where appropriate)
 ## State of ATTinyCore
 Development of ATTinyCore is proceeding in the v2.0.0-dev branch.
