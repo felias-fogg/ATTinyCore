@@ -101,4 +101,4 @@ jq -r                                   \
 }' "package_${REALAUTHOR}_index.json.tmp" > "package_${REALAUTHOR}_index.json"
 
 # Remove files that's no longer needed
-rm -rf "$REPOSITORY-${DOWNLOADED_FILE#"v"}" "package_${REALAUTHOR}_${REPOSITORY}_index.json.tmp"
+rm -rf "$REPOSITORY-${DOWNLOADED_FILE#"v"}" "package_${REALAUTHOR}_index.json.tmp"
