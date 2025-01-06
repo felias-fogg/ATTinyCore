@@ -1789,6 +1789,49 @@
               "version": "1.3.0"
             }
           ]
+        },
+        {
+          "name": "ATTinyCore",
+          "architecture": "avr",
+          "version": "1.6.0+debug-2.1",
+          "category": "Contributed",
+          "url": "https://felias-fogg.github.io/ATTinyCore/ATTinyCore-1.6.0+debug-2.1.tar.bz2",
+          "archiveFileName": "ATTinyCore-1.6.0+debug-2.1.tar.bz2",
+          "checksum": "SHA-256:f2dcbf3409fa479f17fa333b94ff76afa2f116965190726588650edf0ec77d09",
+          "size": "7876594",
+          "boards": [
+            {
+              "name": "<b>Program via ISP or Serial:</b> ATtiny841/441, ATtiny85/45/25, ATtiny84/44/24, ATtiny1634, ATtiny861/461/261, ATtiny167/87, ATtiny43, ATtiny828, ATtiny88/48, ATtiny4313/2313"
+            },
+            {
+              "name": "<br/><b>USB (Micronucleus) Support:</b> DigiSpark (t85), Digispark Pro (t167), MH-ET (t88), Wattuino/Nanite/etc (t841), CaliforniaSTEAM (t84)"
+            },
+            {
+              "name": "<br/><b>Windows users:</b> If USB drivers are not already installed, run the post_install.bat manually or DL from <a href=https://azduino.com/bin/micronucleus>https://azduino.com/bin/micronucleus</a>"
+            }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "7.3.0-atmel3.6.1-arduino7"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.3.0-arduino18"
+            },
+            {
+              "packager": "ATTinyCore",
+              "name": "micronucleus",
+              "version": "2.5-azd1b"
+            },
+            {
+              "packager": "ATTinyCore",
+              "name": "dw-link-tools",
+              "version": "1.3.1"
+            }
+          ]
         }
       ],
       "tools": [
@@ -1974,6 +2017,40 @@
               "host": "i686-mingw32",
               "archiveFileName": "dw-link-tools-1.3.0_i686-mingw32.tar.bz2",
               "url": "https://felias-fogg.github.io/dw-tools/dw-link-tools-1.3.0_i686-mingw32.tar.bz2"
+            }
+          ]
+        },
+        {
+          "name": "dw-link-tools",
+          "version": "1.3.1",
+          "systems": [
+            {
+              "size": "8646257",
+              "checksum": "SHA-256:a4978d8306e8839416e5824786322e2a3450b8d0610b65d8c6f8970bc2fb3e72",
+              "host": "aarch64-linux-gnu",
+              "archiveFileName": "dw-link-tools-1.3.1_aarch64-linux-gnu.tar.bz2",
+              "url": "https://felias-fogg.github.io/dw-tools/dw-link-tools-1.3.1_aarch64-linux-gnu.tar.bz2"
+            },
+            {
+              "size": "12977117",
+              "checksum": "SHA-256:3ca59c56340b59a9c703fddb6cda0251620e687bffe0b21379f9d14cd4c105f4",
+              "host": "x86_64-apple-darwin",
+              "archiveFileName": "dw-link-tools-1.3.1_x86_64-apple-darwin.tar.bz2",
+              "url": "https://felias-fogg.github.io/dw-tools/dw-link-tools-1.3.1_x86_64-apple-darwin.tar.bz2"
+            },
+            {
+              "size": "7539051",
+              "checksum": "SHA-256:44bfa4e11fd9597adb0604f9d17873b9ae5c35ff68e05269474d26a5a10ea0a0",
+              "host": "x86_64-linux-gnu",
+              "archiveFileName": "dw-link-tools-1.3.1_x86_64-linux-gnu.tar.bz2",
+              "url": "https://felias-fogg.github.io/dw-tools/dw-link-tools-1.3.1_x86_64-linux-gnu.tar.bz2"
+            },
+            {
+              "size": "8754203",
+              "checksum": "SHA-256:aeb2c2f844bba27cd67f7985c3ab49c30ff92ea03b254db20d5df90a704fbf0b",
+              "host": "i686-mingw32",
+              "archiveFileName": "dw-link-tools-1.3.1_i686-mingw32.tar.bz2",
+              "url": "https://felias-fogg.github.io/dw-tools/dw-link-tools-1.3.1_i686-mingw32.tar.bz2"
             }
           ]
         }
