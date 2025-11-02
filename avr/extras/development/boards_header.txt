@@ -81,6 +81,8 @@ menu.resetpin=Reset Pin (Only set on bootload via ISP)
 
 # All parts, at the bottom
 menu.optimization="Compiler optimization flags"
+menu.lto="Link Time Optimization"
+
 #______________________________________________________________________________#
 #                                                                              #
 #      ####    ###    ###   ####   ####       #   #  ###  #   # ####  ###      #

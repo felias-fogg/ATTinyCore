@@ -1,5 +1,27 @@
 # ATTinyCore **Universal**
-Arduino support for almost every classic tinyAVR device! Supports ATtiny 1634, 2313/4313, 24/44/84, 441/841, 25/45/85, 261/461/861, 87/167, 48/88, 43, 26 and 828.
+------
+
+*This is a fork of ATTinyCore Universal 2.0.0-dev. It contains changes to enable debugging in the Arduino IDE 2. Specifically, there are the following changes:*
+
+- *`platform.txt` contains changes to make it possible to invoke the GDB server PyAvrOCD.*
+- *`boards.txt` contains changes to allow for disabling link time optimization (LTO).*
+- *`programmers.txt` contains additional programmers.* 
+
+*You can install this fork by adding the following 'Additional Board manager URL' in the preference dialog:* 
+
+```
+https://felias-fogg.github.io/packages_debugging_index.json
+```
+
+*Then choose 'ATTinyCore (Debug enabled)' in the `Board Manager`.*
+
+*For help concerning debugging, consult the [PyAvrOCD manual](https://felias-fogg.github.io/PyAvrOCD/).*
+
+*This fork is based on version 2.0.0-dev. It has its own version numbering scheme, though, since the debugging part will probably evolve over time. Changes from the upstream repo will be added in a timely fashion. Hopefully, at some point, this fork will be integrated into ATTinyCore.*
+
+------
+
+Arduino support for almost every classic tinyAVR device! Supports ATtiny 1634, 2313/4313, 24/44/84, 441/841, 25/45/85, 261/461/861, 87/167, 48/88, 43, 26, and 828.
 
 Supports programming via ISP, Serial (Optiboot) or VUSB (Micronucleus)
 ## [Check it out, we have "discussions" now!](https://github.com/SpenceKonde/ATTinyCore/discussions)
@@ -10,6 +32,7 @@ Let's use that, not gitter.
 ## ATTinyCore 2.0.0 - lots of changes, some of them big, a few of them may cause breakage
 I cobbled ATTinyCore together with far less experience than I have now (indeed, I'd barely covered the basics when I started trying to get a working ATtiny841 core). I like to think I have a much better idea of how a core should be designed now. But this meant some terrible decisions were made in the past. Decisions that we have been paying the price for ever since. I decided that the core should be advanced to a state where the bad decisions have been fixed, and everything that needs to be exposed on the parts is exposed in a consistent manner (too much was done incrementally, and not enough planning was done, ever). This core should not expect any significant new feature enhancements from here on out. The new feature development will be for megaTinyCore and DxCore, as those represent the future of the AVR architecture. Bug fixes will still be made.
 The most significant changes are:
+
 1. **analogRead() and channel/pin numbers** ATTinyCore followed what the core it was based on did, which was to use analog channel numbers, not digital pin numbers for analogRead(). Originally, the An-constants were #defined as the number itself. Later, to make them work with the digital IO functions, I changed to  `#define An (n | 0x80)` - digital functions could check for the high bit, and if present, strip it off and use the analogInputToDigitalPin macro to find the digital pin number. I never did the inverse with analogRead() because it would have broken code which used the raw analog channel numbers. This is just absurd in this day and age, where every other core allows you to analogRead() digital pin numbers and it just works. As of 2.0.0, analogRead() takes either a digital pin number, a constant of the form An (one per analog pin, shown on pinout chart! corresponds directly to analog channels), one of the ADC_CHANNEL constants listed in the part-specific documentations pages (these are things like `ADC_TEMPERATURE` and `ADC_INTERNAL1V1`), or - assuming it has a differential ADC - one of the differential channels. If you were generating an analog channel at runtime, you can pass a number through the ADC_CH() macro to get a number that will be recognized as an analog **channel** number (this is preferred to directly setting the high bit, since it makes clear that you're doing it to get that analog channel). Several people to whom I have spoken about this to expressed disbelief that that was how it worked and unanimously favored this this change.
 2. **Differential channels!** Yeah - about half of the parts we support have them, and they can be useful for accurately measuring small differences in voltage. These vary per part - some are rather basic, while the t861 and t841 are very fancy - and are listed in full in the part-specific documentation. These are now fully supported. For parts that support both modes, there is also a way to select bipolar (-512 to 511) vs unipolar (0 to 1023) mode. Be warned that some parts only support one mode, and others only support the other, and some let you select it. *read the part specific docs for further information*.
 3. All the analog reference sources are named consistently, old (deprecated) names for references are still supported, but not recommended. **potential breakage** If you used to refer to a reference with a raw number, instead of the name (ie, if you did analogReference(0) instead of analogReference(DEFAULT), this will be totally broken for values other than zero (and 0 doesn't have a consistent meaning). The ADC_REF() macro can be used to convert from the REFS bits to a reference constant *if you must - but you shouldn't be using a raw number to select the reference if you want to be able to move it to different parts* - The 1.1v internal reference `INTERNAL1V1` is 2 on some parts, and 0 on others... almost everything has the 1.1v reference and everything can use Vcc, but that's really where the similarities end. If you are writing code that users might want to make work on any other part, you need to use the names, not numbers. With parts having at most 8 options for the analog reference, and most having fewer than that, I do not expect that this is a particularly burdensome requirement. .
