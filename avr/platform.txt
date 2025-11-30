@@ -12,7 +12,7 @@ versionnum.postfix=
 versionnum.released=0
 
 version={versionnum.major}.{versionnum.minor}.{versionnum.patch}{versionnum.postfix}
-version=0.9.0
+version=0.9.1
 
 build.versiondefines=-DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_AVR -DATTINYCORE="{version}" -DATTINYCORE_MAJOR={versionnum.major}UL -DATTINYCORE_MINOR={versionnum.minor}UL -DATTINYCORE_PATCH={versionnum.patch}UL -DATTINYCORE_RELEASED={versionnum.released}
 
@@ -215,16 +215,18 @@ debug.toolchain.path={runtime.tools.avrocd-tools.path}
 debug.server=openocd
 debug.server.openocd.path={debug.toolchain.path}/pyavrocd
 #next doesn't matter, but should be specified so that cortex-debug is happy
-debug.server.openocd.script=nothing
+debug.server.openocd.script=nix
 debug.cortex-debug.custom.gdbPath={debug.toolchain.path}/avr-gdb
 debug.cortex-debug.custom.overrideGDBServerStartedRegex=Listening on port \d+ for gdb connection
 debug.cortex-debug.custom.objdumpPath={runtime.tools.avr-gcc.path}/bin/avr-objdump
-debug.cortex-debug.custom.serverArgs.0=-s
-debug.cortex-debug.custom.serverArgs.1=noop
+debug.cortex-debug.custom.serverArgs.0=-F
+debug.cortex-debug.custom.serverArgs.1={build.f_cpu}
 debug.cortex-debug.custom.serverArgs.2=-d
 debug.cortex-debug.custom.serverArgs.3={build.mcu}
-debug.cortex-debug.custom.serverArgs.4=-m
-debug.cortex-debug.custom.serverArgs.5=all
+debug.cortex-debug.custom.serverArgs.4=-s
+debug.cortex-debug.custom.serverArgs.5=nop
+debug.cortex-debug.custom.serverArgs.6=-m
+debug.cortex-debug.custom.serverArgs.7=all
 debug.cortex-debug.custom.preLaunchCommands.0=monitor debugwire enable
 debug.cortex-debug.custom.runToEntryPoint=main
 debug.svd_file={debug.toolchain.path}/pyavrocd-util/svd/{build.mcu}.svd
