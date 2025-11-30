@@ -12,7 +12,7 @@ versionnum.postfix=
 versionnum.released=0
 
 version={versionnum.major}.{versionnum.minor}.{versionnum.patch}{versionnum.postfix}
-version=0.9.1
+version=0.9.2
 
 build.versiondefines=-DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_AVR -DATTINYCORE="{version}" -DATTINYCORE_MAJOR={versionnum.major}UL -DATTINYCORE_MINOR={versionnum.minor}UL -DATTINYCORE_PATCH={versionnum.patch}UL -DATTINYCORE_RELEASED={versionnum.released}
 
@@ -160,7 +160,7 @@ recipe.hooks.savehex.presavehex.3.pattern.macosx=cp "{build.path}/{build.project
 
 tools.avrdude.path={runtime.tools.avrdude.path}
 tools.avrdude.cmd.path={path}/bin/avrdude
-tools.avrdude.config.path={runtime.platform.path}/avrdude.conf
+tools.avrdude.config.path={path}/etc/avrdude.conf
 
 
 tools.avrdude.upload.params.verbose=-v
