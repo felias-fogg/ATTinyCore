@@ -107,3 +107,6 @@ micronucleusprog.communication=usb
 micronucleusprog.protocol=micronucleus
 micronucleusprog.program.tool={runtime.tools.micronucleus.path}/micronucleus
 micronucleusprog.program.extra_params=-Pusb
+
+simavr.name=Simulator (simavr)
+simavr.debug.cortex-debug.custom.serverArgs.1={debug.toolchain.path}/simavr
