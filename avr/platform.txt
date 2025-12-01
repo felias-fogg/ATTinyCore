@@ -12,7 +12,7 @@ versionnum.postfix=
 versionnum.released=0
 
 #version={versionnum.major}.{versionnum.minor}.{versionnum.patch}{versionnum.postfix}
-version=0.9.5
+version=0.9.6
 
 build.versiondefines=-DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_AVR -DATTINYCORE="{version}" -DATTINYCORE_MAJOR={versionnum.major}UL -DATTINYCORE_MINOR={versionnum.minor}UL -DATTINYCORE_PATCH={versionnum.patch}UL -DATTINYCORE_RELEASED={versionnum.released}
 
