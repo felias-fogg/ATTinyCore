@@ -12,7 +12,7 @@ versionnum.postfix=
 versionnum.released=0
 
 #version={versionnum.major}.{versionnum.minor}.{versionnum.patch}{versionnum.postfix}
-version=0.9.7
+version=0.9.8
 
 build.versiondefines=-DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_AVR -DATTINYCORE="{version}" -DATTINYCORE_MAJOR={versionnum.major}UL -DATTINYCORE_MINOR={versionnum.minor}UL -DATTINYCORE_PATCH={versionnum.patch}UL -DATTINYCORE_RELEASED={versionnum.released}
 
@@ -23,9 +23,9 @@ build.optiondefines=-DF_CPU={build.f_cpu} -DCLOCK_SOURCE={build.clocksource} {bu
 #########################
 
 # Optimization flags for debugging
-compiler.optimization_flags=
-compiler.optimization_flags.release=
-compiler.optimization_flags.debug=-Og -ggdb3
+compiler.optimization_flags=-Os -DNDEBUG
+compiler.optimization_flags.release=-Os -DNDEBUG
+compiler.optimization_flags.debug=-Og -ggdb3 -DDEBUG
 
 compiler.warning_flags=-Wall
 compiler.warning_flags.none=-Wall

@@ -7,10 +7,10 @@
 - *`boards.txt` contains changes to allow for disabling link time optimization (LTO).*
 - *`programmers.txt` contains additional programmers.* 
 
-*You can install this fork by adding the following 'Additional Board manager URL' in the preference dialog:* 
+*You can make this fork installable through the boards manager by adding the following `Additional Boards manager URL` in the `Preference` dialog:* 
 
 ```
-https://felias-fogg.github.io/packages_debugging_index.json
+https://downloads.pyavrocd.io/package_debug_enabled_index.json
 ```
 
 *Then choose 'ATTinyCore (Debug enabled)' in the `Board Manager`.*
@@ -18,6 +18,8 @@ https://felias-fogg.github.io/packages_debugging_index.json
 *For help concerning debugging, consult the [PyAvrOCD manual](https://felias-fogg.github.io/PyAvrOCD/).*
 
 *This fork is based on version 2.0.0-dev. It has its own version numbering scheme, though, since the debugging part will probably evolve over time. Changes from the upstream repo will be added in a timely fashion. Hopefully, at some point, this fork will be integrated into ATTinyCore.*
+
+***Currently, the support for downloading the micronucleus uploaders has been removed because the download website cannot be reached (Jan-1-2026)***
 
 ------
 
