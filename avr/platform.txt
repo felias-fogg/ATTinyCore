@@ -7,7 +7,7 @@ name=ATTinyCore (Debug enabled)
 
 versionnum.major=0
 versionnum.minor=9
-versionnum.patch=0
+versionnum.patch=8
 versionnum.postfix=
 versionnum.released=0
 
