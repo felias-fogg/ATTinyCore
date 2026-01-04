@@ -5,10 +5,15 @@
 # https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5---3rd-party-Hardware-specification
 
 name=ATTinyCore
-version=1.5.2
+version=1.5.3
 
 # AVR compile variables
 # ---------------------
+
+# Optimization flags for debugging
+compiler.optimization_flags=-Os -ggdb3 -DNDBEUG
+compiler.optimization_flags.release=-Os -ggdb3 -DNDBEUG
+compiler.optimization_flags.debug=-Og -ggdb3 -DDEBUG
 
 compiler.warning_flags=-w
 compiler.warning_flags.none=-w
@@ -19,12 +24,12 @@ compiler.warning_flags.all=-Wall -Wextra
 # Default "compiler.path" is correct, change only if you want to overidde the initial value
 compiler.path={runtime.tools.avr-gcc.path}/bin/
 compiler.c.cmd=avr-gcc
-compiler.c.flags=-c -g -Os {compiler.warning_flags} -std=gnu11 -ffunction-sections -fdata-sections -MMD {ltocflags}
-compiler.c.elf.flags={compiler.warning_flags} -Os {ltoelfflags} -Wl,--gc-sections
+compiler.c.flags=-c -g {compiler.optimization_flags} {compiler.warning_flags} -std=gnu11 -ffunction-sections -fdata-sections -MMD {ltocflags}
+compiler.c.elf.flags={compiler.warning_flags} {compiler.optimization_flags} {ltoelfflags} -Wl,--gc-sections
 compiler.c.elf.cmd=avr-gcc
 compiler.S.flags=-c -g -x assembler-with-cpp {ltocppflags}
 compiler.cpp.cmd=avr-g++
-compiler.cpp.flags=-c -g -Os {compiler.warning_flags} -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -MMD {ltocppflags}
+compiler.cpp.flags=-c -g {compiler.optimization_flags} {compiler.warning_flags} -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -MMD {ltocppflags}
 compiler.ar.cmd=avr-{ltoarcmd}ar
 compiler.ar.flags=rcs
 compiler.objcopy.cmd=avr-objcopy
@@ -153,3 +158,29 @@ tools.micronucleus.erase.pattern=
 # - from numeric vendor ID, set to Unknown otherwise
 build.usb_manufacturer=
 build.usb_flags=
+
+# Debugger configuration (general options)
+# ----------------------------------------
+debug.executable={build.path}/{build.project_name}.elf
+debug.toolchain=gcc
+debug.toolchain.path={runtime.tools.avrocd-tools.path}
+
+debug.server=openocd
+debug.server.openocd.path={debug.toolchain.path}/pyavrocd
+#next doesn't matter, but should be specified so that cortex-debug is happy
+debug.server.openocd.script=doesnotmatter
+debug.cortex-debug.custom.gdbPath={debug.toolchain.path}/avr-gdb
+debug.cortex-debug.custom.overrideGDBServerStartedRegex=Listening on port \d+ for gdb connection
+debug.cortex-debug.custom.objdumpPath={runtime.tools.avr-gcc.path}/bin/avr-objdump
+debug.cortex-debug.custom.serverArgs.0=-s
+# The nop should be the serverArgs.1 because the programmer simavr may change that!
+debug.cortex-debug.custom.serverArgs.1=nop
+debug.cortex-debug.custom.serverArgs.2=-d
+debug.cortex-debug.custom.serverArgs.3={build.mcu}
+debug.cortex-debug.custom.serverArgs.4=--manage
+debug.cortex-debug.custom.serverArgs.5=all
+debug.cortex-debug.custom.serverArgs.6=--F_CPU
+debug.cortex-debug.custom.serverArgs.7={build.f_cpu}
+debug.cortex-debug.custom.preLaunchCommands.0=monitor debugwire enable
+debug.cortex-debug.custom.runToEntryPoint=main
+debug.svd_file={debug.toolchain.path}/pyavrocd-util/svd/{build.mcu}.svd

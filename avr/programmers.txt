@@ -21,19 +21,19 @@ avrispmkii.program.protocol=stk500v2
 avrispmkii.program.tool=avrdude
 avrispmkii.program.extra_params=-Pusb
 
-usbtinyisp.name=USBtinyISP (ATTinyCore) SLOW, for new or 1 MHz parts
+usbtinyisp.name=USBtinyISP SLOW, for new or 1 MHz parts
 usbtinyisp.protocol=usbtiny
 usbtinyisp.program.tool=avrdude
 usbtinyisp.program.speed=8
 usbtinyisp.program.extra_params=-B{program.speed}
 
-usbtinyisp2.name=USBtinyISP (ATTinyCore) FAST, for parts running >=2 MHz
+usbtinyisp2.name=USBtinyISP FAST, for parts running >=2 MHz
 usbtinyisp2.protocol=usbtiny
 usbtinyisp2.program.tool=avrdude
 usbtinyisp2.program.speed=0.3
 usbtinyisp2.program.extra_params=-B{program.speed}
 
-usbasp.name=USBasp (ATTinyCore)
+usbasp.name=USBasp 
 usbasp.communication=usb
 usbasp.protocol=usbasp
 usbasp.program.tool=avrdude
@@ -63,7 +63,7 @@ arduinoasisp32u4.program.speed=19200
 arduinoasisp32u4.program.tool=avrdude
 arduinoasisp32u4.program.extra_params=-P{serial.port} -b{program.speed}
 
-dragon.name=AVR Dragon ISP mode (ATTinyCore)
+dragon.name=AVR Dragon ISP
 dragon.communication=usb
 dragon.protocol=dragon_isp
 dragon.program.tool=avrdude
@@ -84,15 +84,55 @@ stk500.program.protocol=stk500
 stk500.program.tool=avrdude
 stk500.program.extra_params=-P{serial.port}
 
-atmel_ice.name=Atmel-ICE
-atmel_ice.communication=usb
-atmel_ice.protocol=atmelice_isp
-atmel_ice.program.protocol=atmelice_isp
-atmel_ice.program.tool=avrdude
-atmel_ice.program.extra_params=-Pusb
-
 micronucleusprog.name=Micronucleus
 micronucleusprog.communication=usb
 micronucleusprog.protocol=micronucleus
 micronucleusprog.program.tool={runtime.tools.micronucleus.path}/micronucleus
 micronucleusprog.program.extra_params=-Pusb
+
+#### ISP programmer / Debugger
+
+atmel_ice_isp.name=Atmel-ICE (AVR) ISP
+atmel_ice_isp.communication=usb
+atmel_ice_isp.protocol=atmelice_isp
+atmel_ice_isp.program.protocol=atmelice_isp
+atmel_ice_isp.program.tool=avrdude
+atmel_ice_isp.program.extra_params=
+
+atmel_powerdebugger_isp.name=Power Debugger (AVR) ISP
+atmel_powerdebugger_isp.communication=usb
+atmel_powerdebugger_isp.protocol=powerdebugger_isp
+atmel_powerdebugger_isp.program.protocol=powerdebugger_isp
+atmel_powerdebugger_isp.program.tool=avrdude
+atmel_powerdebugger_isp.program.extra_params=
+
+atmel_jtagice3_isp.name=JTAGICE3 ISP
+atmel_jtagice3_isp.communication=usb
+atmel_jtagice3_isp.protocol=jtag3isp
+atmel_jtagice3_isp.program.protocol=jtag3isp
+atmel_jtagice3_isp.program.tool=avrdude
+atmel_jtagice3_isp.program.extra_params=
+
+pickit4_isp.name=PICkit4 ISP
+pickit4_isp.communication=usb
+pickit4_isp.protocol=pickit4_isp
+pickit4_isp.program.protocol=pickit4_isp
+pickit4_isp.program.tool=avrdude
+pickit4_isp.program.extra_params=
+
+snap_isp.name=MPLAB SNAP ISP
+snap_isp.communication=usb
+snap_isp.protocol=snap_isp
+snap_isp.program.protocol=snap_isp
+snap_isp.program.tool=avrdude
+snap_isp.program.extra_params=
+
+# Simulator
+
+simavr.name=Simulator (simavr)
+simavr.debug.cortex-debug.custom.serverArgs.1={debug.toolchain.path}/bin/simavr
+simavr.protocol=This_is_not_a_programmer_but_only_a_flag_to_use_the_simulator_when_debugging
+simavr.upload.protocol=This_is_not_a_programmer_but_only_a_flag_to_use_the_simulator_when_debugging
+simavr.program.protocol=This_is_not_a_programmer_but_only_a_flag_to_use_the_simulator_when_debugging
+simavr.program.tool=avrdude
+simavr.program.extra_params=

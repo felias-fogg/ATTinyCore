@@ -1,5 +1,34 @@
 # ATTinyCore **Universal**
+------
+
+*This is a fork of ATTinyCore Universal 1.5.2. It contains changes to enable debugging in the Arduino IDE 2. Specifically, there are the following changes:*
+
+- *`platform.txt` contains changes to make it possible to invoke the GDB server PyAvrOCD.*
+- *`boards.txt` contains changes to allow for disabling link time optimization (LTO).*
+- *`programmers.txt` contains additional programmers.*
+
+*You can make this fork installable through the boards manager by adding the following `Additional Boards manager URL` in the `Preference` dialog:*
+
+```
+https://downloads.pyavrocd.io/package_debug_enabled_index.json
+```
+
+*Then choose 'ATTinyCore (Debug enabled)' in the `Board Manager`.*
+
+*For help concerning debugging, consult the [PyAvrOCD manual](https://felias-fogg.github.io/PyAvrOCD/).*
+
+------
+
+*This fork is based on ATTinyCore version 1.5.2. The version numbering of the fork will simply increase the patch level. Hopefully, at some point, this fork will be integrated into ATTinyCore.* 
+
+*Initially, I had hoped to base this extension on ATTinyCore 2.0.0. However, I hit severe roadblocks because code generation has significantly changed and for some strange reason seems to prohibit debugging. For this reason, we will for this time stick with the 'classic' version 1.5.2.*
+
+***Currently, the support for downloading the micronucleus uploaders has been removed because the download website cannot be reached (Jan 1, 2026)***. 
+
+------
+
 Arduino support for almost every classic tinyAVR device! Supports ATtiny 1634, 2313/4313, 24/44/84, 441/841, 25/45/85, 261/461/861, 87/167, 48/88, 43 and 828. Supports programming vis ISP, Serial (Optiboot - all parts with >4k flash, and all parts with 4k flash for which an 8k version is available) or VUSB (Micronucleus - where appropriate)
+
 ## State of ATTinyCore
 Development of ATTinyCore is proceeding in the v2.0.0-dev branch.
 
