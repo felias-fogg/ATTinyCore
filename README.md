@@ -23,8 +23,6 @@ https://downloads.pyavrocd.io/package_debug_enabled_index.json
 
 *Initially, I had hoped to base this extension on ATTinyCore 2.0.0. However, I hit severe roadblocks because code generation has significantly changed and for some strange reason seems to prohibit debugging. For this reason, we will for this time stick with the 'classic' version 1.5.2.*
 
-***Currently, the support for downloading the micronucleus uploaders has been removed because the download website cannot be reached (Jan 1, 2026)***. 
-
 ------
 
 Arduino support for almost every classic tinyAVR device! Supports ATtiny 1634, 2313/4313, 24/44/84, 441/841, 25/45/85, 261/461/861, 87/167, 48/88, 43 and 828. Supports programming vis ISP, Serial (Optiboot - all parts with >4k flash, and all parts with 4k flash for which an 8k version is available) or VUSB (Micronucleus - where appropriate)

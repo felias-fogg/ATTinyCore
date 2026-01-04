@@ -1,9 +1,13 @@
 # This document lists significant changes and bugfixes, including those not in yet in a release.
 Any changes listed at the top, without a version number above thenm, have not been in a release yet, but can be downloaded from github for manual installation.
 
+### 1.5.4
+* Made a new entry for ATtiny2313A since this has its OCD register at a different address!
+* Retrieved the micronucleus CLIs from the Wayback Machine and made them available as a tool.
+
 ### 1.5.3
-* First debug-enabled version based on ATTinyCore 1.5.2 with the new PyAvrOCD GDB server. Extensions in platform.txt and programmer.txt.
-* Removed tool dependency concerning micronucleus uploaders because download website is unreachable.
+* First debug-enabled version based on ATTinyCore 1.5.2n with the new PyAvrOCD GDB server. Extensions in platform.txt and programmer.txt.
+* Removed tool dependency concerning micronucleus uploaders because the download website is unreachable.
 
 ### 1.5.2
 * New pinout images (#535) Thanks, @MCUdude!
