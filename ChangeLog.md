@@ -1,5 +1,9 @@
 # This document lists significant changes and bugfixes, including those not in yet in a release.
-Any changes listed at the top, without a version number above thenm, have not been in a release yet, but can be downloaded from github for manual installation.
+Any changes listed at the top, without a version number above them, have not been in a release yet, but can be downloaded from GitHub for manual installation.
+
+### 1.5.5
+
+- Changed name back from ATTinyCore-debug-enabled to ATTinyCore in order to avoid (external) confusion. So, now you can use the fork as a drop-in replacement.
 
 ### 1.5.4
 * Made a new entry for ATtiny2313A since this has its OCD register at a different address!
