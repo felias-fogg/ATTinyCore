@@ -1,0 +1,140 @@
+#!/bin/bash
+
+##########################################################
+##                                                      ##
+## Shell script for generating a boards manager release ##
+## Created by MCUdude                                   ##
+## Requires wget, jq and a bash environment             ##
+##                                                      ##
+##########################################################
+
+# Change these to match your repo
+VERSION=$1
+PAOOWNER=felias-fogg  # Github owner of PyAvrOCD  
+AUTHOR=felias-fogg        # Github user name
+REALAUTHOR=felias-fogg    # real author
+REPOSITORY=ATTinyCore # Github repo name
+
+if [ "x${VERSION}" == "x" ]; then
+    echo "You need to specify a version"
+    exit 1
+fi
+
+AVRDUDE_VERSION="8.0-arduino.1"
+
+# Get the version number of most recent PyAvrOCD version
+PAOVERSION=$(curl -s https://api.github.com/repos/$PAOOWNER/PyAvrOCD/releases/latest | grep "tag_name" |  awk -F\" '{print $4}')
+AVROCDVERSION=${PAOVERSION#"v"}
+
+# Get the download URL for the latest release from Github
+DOWNLOAD_URL=$(curl -s https://api.github.com/repos/$AUTHOR/$REPOSITORY/releases/tags/${VERSION} | grep "tarball_url" | awk -F\" '{print $4}')
+
+if [ "x${DOWNLOAD_URL}" == "x" ]; then
+    echo "Version '${VERSION}' does not exist"
+    exit 1
+fi
+
+# Get filename
+DOWNLOADED_FILE=$(echo $DOWNLOAD_URL | awk -F/ '{print $8}')
+
+# Check whether most recent board file is already in the index
+if grep -q ${REPOSITORY}-${DOWNLOADED_FILE#"v"} package_${REALAUTHOR}_${REPOSITORY}_index.json; then
+    echo "Most recent board version is already in the index file. Nothing to do."
+    exit 1
+fi
+
+# Check whether already part of the index
+if grep -q "avrocd-tools-"${AVROCDVERSION} package_${REALAUTHOR}_${REPOSITORY}_index.json; then
+    echo "Current PyAvrOCD version is in index. Continue ..."
+else
+    echo "Current PyAvrOCD version is not in index. Add it first."
+    exit 1
+fi
+
+
+# Download file
+wget --no-verbose $DOWNLOAD_URL
+
+# Add .tar.bz2 extension to downloaded file
+mv $DOWNLOADED_FILE ${DOWNLOADED_FILE}.tar.bz2
+
+# Extract downloaded file and place it in a folder
+printf "\nExtracting folder ${DOWNLOADED_FILE}.tar.bz2 to $REPOSITORY-${DOWNLOADED_FILE#"v"}\n"
+mkdir -p "$REPOSITORY-${DOWNLOADED_FILE#"v"}" && tar -xzf ${DOWNLOADED_FILE}.tar.bz2 -C "$REPOSITORY-${DOWNLOADED_FILE#"v"}" --strip-components=1
+printf "Done!\n"
+
+# Move files out of the avr folder
+mv $REPOSITORY-${DOWNLOADED_FILE#"v"}/avr/* $REPOSITORY-${DOWNLOADED_FILE#"v"}
+
+# Delete downloaded file and empty avr folder
+rm -rf ${DOWNLOADED_FILE}.tar.bz2 $REPOSITORY-${DOWNLOADED_FILE#"v"}/avr
+
+# Make sure there are no macOS related files added to the arching that's soon to be geneated
+dot_clean .
+
+# Compress folder to tar.bz2
+printf "\nCompressing folder $REPOSITORY-${DOWNLOADED_FILE#"v"} to $REPOSITORY-${DOWNLOADED_FILE#"v"}.tar.bz2\n"
+tar -cjSf $REPOSITORY-${DOWNLOADED_FILE#"v"}.tar.bz2 $REPOSITORY-${DOWNLOADED_FILE#"v"}
+printf "Done!\n"
+
+# Get file size on bytes
+FILE_SIZE=$(wc -c "$REPOSITORY-${DOWNLOADED_FILE#"v"}.tar.bz2" | awk '{print $1}')
+
+# Get SHA256 hash
+SHA256="SHA-256:$(shasum -a 256 "$REPOSITORY-${DOWNLOADED_FILE#"v"}.tar.bz2" | awk '{print $1}')"
+
+# Create Github download URL
+URL="https://${AUTHOR}.github.io/${REPOSITORY}/$REPOSITORY-${DOWNLOADED_FILE#"v"}.tar.bz2"
+
+cp "package_${REALAUTHOR}_${REPOSITORY}_index.json" "package_${REALAUTHOR}_${REPOSITORY}_index.json.tmp"
+
+# Add new boards release entry
+jq -r                                    \
+--arg avrocdversion $AVROCDVERSION       \
+--arg repository  $REPOSITORY            \
+--arg version     ${DOWNLOADED_FILE#"v"} \
+--arg url         $URL                   \
+--arg checksum    $SHA256                \
+--arg file_size   $FILE_SIZE             \
+--arg avrdude_ver $AVRDUDE_VERSION       \
+--arg file_name   $REPOSITORY-${DOWNLOADED_FILE#"v"}.tar.bz2  \
+'.packages[].platforms[.packages[].platforms | length] |= . +
+{
+  "name": $repository,
+  "architecture": "avr",
+  "version": $version,
+  "category": "Contributed",
+  "url": $url,
+  "archiveFileName": $file_name,
+  "checksum": $checksum,
+  "size": $file_size,
+  "boards": [
+    {"name": "Classic ATtinys"}
+  ],
+  "toolsDependencies": [
+    {
+      "packager": "arduino",
+      "name": "avr-gcc",
+      "version": "7.3.0-atmel3.6.1-arduino7"
+    },
+    {
+      "packager": "ATTinyCore",
+      "name": "avrdude",
+      "version": $avrdude_ver
+    },
+    {
+      "packager": "arduino",
+      "name": "arduinoOTA",
+      "version": "1.3.0"
+    },
+    {
+      "packager": "ATTinyCore",
+      "name": "avrocd-tools",
+      "version": $avrocdversion
+    }   
+  ]
+}' "package_${REALAUTHOR}_${REPOSITORY}_index.json.tmp" > "package_${REALAUTHOR}_${REPOSITORY}_index.json"
+
+# Remove files that's no longer needed
+rm -rf "$REPOSITORY-${DOWNLOADED_FILE#"v"}" "package_${REALAUTHOR}_${REPOSITORY}_index.json.tmp"
+
