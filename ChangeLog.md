@@ -1,6 +1,10 @@
 # This document lists significant changes and bugfixes, including those not in yet in a release.
 Any changes listed at the top, without a version number above them, have not been in a release yet, but can be downloaded from GitHub for manual installation.
 
+### 1.5.7
+
+* Deprecation notice added.
+
 ### 1.5.6
 * Changed tools.avrdude.config.path in platform.txt to the correct config file: {tools.avrdude.path}/etc/avrdude.config Now programming should work
 

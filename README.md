@@ -1,7 +1,11 @@
-# ATTinyCore **Universal**
+# [DEPRECATED] ATTinyCore **Universal**
 ------
 
-*This is a fork of ATTinyCore Universal 1.5.2. It contains changes to enable debugging in the Arduino IDE 2. Specifically, there are the following changes:*
+This is a fork of ATTinyCore Universal 1.5.2. Its is now deprecated. Further development takes place in [**TinyCore**](https://github.com/MCUdude/TinyCore), which is a fork of ATTinyCore 2.0.0.
+
+------
+
+*This fork contains changes to enable debugging in the Arduino IDE 2. Specifically, there are the following changes:*
 
 - *`platform.txt` contains changes to make it possible to invoke the GDB server PyAvrOCD.*
 - *`boards.txt` contains changes to allow for disabling link time optimization (LTO).*
