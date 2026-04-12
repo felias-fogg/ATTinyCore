@@ -1,11 +1,13 @@
-# [DEPRECATED] ATTinyCore **Universal**
+# ATTinyCore (Debug enabled)
 ------
 
-This is a fork of ATTinyCore Universal 1.5.2. Its is now deprecated. Further development takes place in [**TinyCore**](https://github.com/MCUdude/TinyCore), which is a fork of ATTinyCore 2.0.0.
+This is a fork of ATTinyCore Universal 1.5.2. Its is now **deprecated**. Further development takes place in [**TinyCore**](https://github.com/MCUdude/TinyCore), which is a fork of ATTinyCore 2.0.0. 
 
 ------
 
 *This fork contains changes to enable debugging in the Arduino IDE 2. Specifically, there are the following changes:*
+
+* *The board management file contains references to an accessible repository of micronucleus bootloaders so that the core is installable although the site `azduino.com` is unavailable.*
 
 - *`platform.txt` contains changes to make it possible to invoke the GDB server PyAvrOCD.*
 - *`boards.txt` contains changes to allow for disabling link time optimization (LTO).*
@@ -14,7 +16,7 @@ This is a fork of ATTinyCore Universal 1.5.2. Its is now deprecated. Further dev
 *You can make this fork installable through the boards manager by adding the following `Additional Boards manager URL` in the `Preference` dialog:*
 
 ```
-https://downloads.pyavrocd.io/package_debug_enabled_index.json
+https://felias-fogg.github.io/ATTinyCore/package_drazzy.com_ATTinyCore_index.json
 ```
 
 *Then choose 'ATTinyCore (Debug enabled)' in the `Board Manager`.*
