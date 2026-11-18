@@ -127,6 +127,22 @@ snap_isp.program.protocol=snap_isp
 snap_isp.program.tool=avrdude
 snap_isp.program.extra_params=
 
+dwlink.name=dw-link (ISP mode)
+dwlink.communication=serial
+dwlink.protocol=jtag2isp
+dwlink.program.protocol=jtag2isp
+dwlink.program.tool=avrdude
+dwlink.program.tool.default=avrdude
+dwlink.program.extra_params=-P{serial.port}
+
+jtagice2_isp.name=JTAGICE mkII (ISP mode)
+jtagice2_isp.communication=usb
+jtagice2_isp.protocol=jtag2isp
+jtagice2_isp.program.protocol=jtag2isp
+jtagice2_isp.program.tool=avrdude
+jtagice2_isp.program.tool.default=avrdude
+jtagice2_isp.program.extra_params=-Pusb
+
 # Simulator
 
 simavr.name=Simulator (simavr)

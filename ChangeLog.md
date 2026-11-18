@@ -3,8 +3,10 @@ Any changes listed at the top, without a version number above them, have not bee
 
 ### 1.5.8
 
+* The core is now called ATTinyCore (debug-configured): it is configured for debugging, while the debug tools come from the AvrDebugger package.
 * The debug tools now come from the AvrDebugger package, which has to be installed in addition; the core no longer installs its own copy (avrocd-tools).
 * The GDB server is started with `--arduino-ide` and with long option names.
+* Two more programmers for "Upload Using Programmer" and "Burn Bootloader": dw-link (ISP mode) and JTAGICE mkII (ISP mode).
 * When AvrDebugger is missing, clicking `Debug` brings up the gdb-server terminal, which says what to install. The stubs that do this are in `debugger/fallback/bin`, from AvrDebugger 0.1.1.
 
 ### 1.5.7

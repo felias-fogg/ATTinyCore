@@ -1,13 +1,11 @@
-# ATTinyCore (Debug enabled)
+# ATTinyCore (debug-configured)
 ------
 
-This is a fork of ATTinyCore Universal 1.5.2. Its is now **deprecated**. Further development takes place in [**TinyCore**](https://github.com/MCUdude/TinyCore), which is a fork of ATTinyCore 2.0.0. 
+*This is a fork of ATTinyCore Universal 1.5.2. It is now **deprecated**. Further development takes place in [**TinyCore**](https://github.com/MCUdude/TinyCore), which is a fork of ATTinyCore 2.0.0. However, I still maintain ATTinyCore 1.5.2 here so that people can use it if they want. The version numbering of the fork will simply increase the patch level.*
 
-------
+*This fork contains changes to permit the download of ATTinyCore (even when parts of azduino.com do not work), and enable debugging in Arduino IDE 2. Specifically, the following changes are included:*
 
-*This fork contains changes to enable debugging in the Arduino IDE 2. Specifically, there are the following changes:*
-
-* *The board management file contains references to an accessible repository of micronucleus bootloaders so that the core is installable although the site `azduino.com` is unavailable.*
+* *The board management file contains references to an **accessible repository of micronucleus bootloaders** so that the core is installable even when `azduino.com` is unavailable.*
 
 - *`platform.txt` contains changes to make it possible to invoke the GDB server PyAvrOCD.*
 - *`boards.txt` contains changes to allow for disabling link time optimization (LTO).*
@@ -19,7 +17,7 @@ This is a fork of ATTinyCore Universal 1.5.2. Its is now **deprecated**. Further
 https://felias-fogg.github.io/ATTinyCore/package_drazzy.com_ATTinyCore_index.json
 ```
 
-*Then choose 'ATTinyCore (Debug enabled)' in the `Board Manager`.*
+*Then choose 'ATTinyCore (debug-configured)' in the `Board Manager`.*
 
 *Since version 1.5.8, the debug tools (PyAvrOCD, avr-gdb, simavr and the SVD files) come from the AvrDebugger package, which has to be installed in addition. Add the following URL as well, and install AvrDebugger in the `Board Manager`:*
 
@@ -30,12 +28,6 @@ https://felias-fogg.github.io/AvrDebugger/package_felias-fogg_AvrDebugger_index.
 *If you click `Debug` without it, the IDE says so in its gdb-server terminal.*
 
 *For help concerning debugging, consult the [PyAvrOCD manual](https://pyavrocd.io).*
-
-------
-
-*This fork is based on ATTinyCore version 1.5.2. The version numbering of the fork will simply increase the patch level. Hopefully, at some point, this fork will be integrated into ATTinyCore.* 
-
-*Initially, I had hoped to base this extension on ATTinyCore 2.0.0. However, I hit severe roadblocks because code generation has significantly changed and for some strange reason seems to prohibit debugging. For this reason, we will for this time stick with the 'classic' version 1.5.2.*
 
 ------
 
