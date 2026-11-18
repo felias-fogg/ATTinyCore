@@ -10,10 +10,10 @@
 # the checks and every compilation have passed.
 #
 # arduino-lint is the repository's own workflow, called rather than copied (it
-# gained a 'workflow_call' trigger and is otherwise untouched). The other upstream
-# checks are left out: formatting, spelling and links fail for reasons a release
-# cannot help, and check-keywords-txt looks at megaavr/libraries, which this core
-# does not have.
+# gained a 'workflow_call' trigger and is otherwise untouched); it also checks the
+# libraries in avr/libraries. The other upstream checks (formatting, spelling,
+# links, keywords, size deltas) were removed with 1.5.8: they had been switched
+# off, failed on upstream text, or looked at folders this core does not have.
 
 name: Release
 
