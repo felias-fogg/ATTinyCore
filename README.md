@@ -21,7 +21,15 @@ https://felias-fogg.github.io/ATTinyCore/package_drazzy.com_ATTinyCore_index.jso
 
 *Then choose 'ATTinyCore (Debug enabled)' in the `Board Manager`.*
 
-*For help concerning debugging, consult the [PyAvrOCD manual](https://felias-fogg.github.io/PyAvrOCD/).*
+*Since version 1.5.8, the debug tools (PyAvrOCD, avr-gdb, simavr and the SVD files) come from the AvrDebugger package, which has to be installed in addition. Add the following URL as well, and install AvrDebugger in the `Board Manager`:*
+
+```
+https://felias-fogg.github.io/AvrDebugger/package_felias-fogg_AvrDebugger_index.json
+```
+
+*If you click `Debug` without it, the IDE says so in its gdb-server terminal.*
+
+*For help concerning debugging, consult the [PyAvrOCD manual](https://pyavrocd.io).*
 
 ------
 

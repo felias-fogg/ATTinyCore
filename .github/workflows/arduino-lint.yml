@@ -9,6 +9,8 @@ on:
     - cron: "0 8 * * TUE"
   workflow_dispatch:
   repository_dispatch:
+  # so that the release workflow can run it before it publishes
+  workflow_call:
 
 jobs:
   lint:

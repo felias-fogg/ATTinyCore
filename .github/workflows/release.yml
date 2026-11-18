@@ -1,0 +1,173 @@
+# Releasing the core: the checks first, then the mechanical part.
+#
+# Push a tag and this does the rest (extras/release.sh checks and pushes it):
+#
+#     ./extras/release.sh 1.5.8-rc1      # a candidate to try out
+#     ./extras/release.sh 1.5.8          # the real thing
+#
+# A tag carrying -rc is published as a pre-release and goes into an index of its
+# own, so it never reaches an ordinary board manager. Nothing is published unless
+# the checks and every compilation have passed.
+#
+# arduino-lint is the repository's own workflow, called rather than copied (it
+# gained a 'workflow_call' trigger and is otherwise untouched). The other upstream
+# checks are left out: formatting, spelling and links fail for reasons a release
+# cannot help, and check-keywords-txt looks at megaavr/libraries, which this core
+# does not have.
+
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write          # to create the release and to push to gh-pages
+
+jobs:
+  version:
+    name: The tag matches the core
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compare the tag with avr/platform.txt and ChangeLog.md
+        run: |
+          # A candidate is checked against the version it is a candidate for:
+          # v1.5.8-rc2 belongs to 1.5.8, so trying one out does not mean
+          # touching the version number for every attempt.
+          TAG="${GITHUB_REF_NAME#v}"
+          WANT="${TAG%%-*}"
+          HAVE="$(sed -n 's/^version=//p' avr/platform.txt)"
+          echo "the tag says ${WANT}, avr/platform.txt says ${HAVE}"
+          test "$WANT" = "$HAVE"
+          grep -Eq "^#+[[:space:]]*v?${WANT//./\\.}[[:space:]]*$" ChangeLog.md \
+            || { echo "ChangeLog.md has no section for ${WANT}"; exit 1; }
+
+  lint:
+    uses: ./.github/workflows/arduino-lint.yml
+
+  compile:
+    name: Compile one board per family
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: ATTinyCore
+
+      - uses: arduino/setup-arduino-cli@v2
+
+      - name: Put the core where arduino-cli finds it
+        run: |
+          SKETCHBOOK="$HOME/Arduino"
+          arduino-cli config init --overwrite
+          arduino-cli config set directories.user "$SKETCHBOOK"
+          mkdir -p "$SKETCHBOOK/hardware/ATTinyCore"
+          cp -r ATTinyCore/avr "$SKETCHBOOK/hardware/ATTinyCore/avr"
+          arduino-cli core update-index
+          arduino-cli core install arduino:avr       # for the toolchain the core uses
+          mkdir -p "$HOME/sketches/Blink"
+          printf '%s\n' \
+            'void setup() { pinMode(LED_BUILTIN, OUTPUT); }' \
+            'void loop() { digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN)); delay(500); }' \
+            > "$HOME/sketches/Blink/Blink.ino"
+
+      - name: Compile, as released and optimized for debugging
+        run: |
+          fail=0
+          for board in attiny1634 attinyx313 attinyx4 attinyx41 attinyx5 attinyx61 \
+                       attinyx7 attinyx8 attiny43 attiny828; do
+            for opt in "" --optimize-for-debug; do
+              if arduino-cli compile -b "ATTinyCore:avr:${board}" $opt "$HOME/sketches/Blink" \
+                   > out.txt 2>&1; then
+                echo "ok   ${board} ${opt}"
+              else
+                echo "FAIL ${board} ${opt}"; cat out.txt; fail=1
+              fi
+            done
+          done
+          exit $fail
+
+      - name: Optimize for debugging gives -Og
+        run: |
+          arduino-cli compile -v -b ATTinyCore:avr:attinyx5 --optimize-for-debug \
+              "$HOME/sketches/Blink" | grep -q -- " -Og " \
+            || { echo "a debug build did not get -Og"; exit 1; }
+          echo "-Og with --optimize-for-debug"
+
+  publish:
+    name: Publish
+    needs: [version, lint, compile]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Creating the release and adding it to the index are two steps, and
+          # only the second one can fail in ways worth retrying. So skip this
+          # when the release is already there, and a re-run of the job works.
+          if gh release view "${GITHUB_REF_NAME}" > /dev/null 2>&1; then
+            echo "the release already exists, leaving it alone"
+            exit 0
+          fi
+          # The notes are the ChangeLog section of the version (### 1.5.8 up to
+          # the next heading).
+          TAG="${GITHUB_REF_NAME#v}"
+          WANT="${TAG%%-*}"
+          awk -v v="$WANT" '
+            /^#+[[:space:]]/ { if (found) exit; h=$0; sub(/^#+[[:space:]]*v?/, "", h);
+                               sub(/[[:space:]]*$/, "", h); if (h == v) { found=1; next } }
+            found { print }' ChangeLog.md > notes.md
+          PRE=""
+          case "${GITHUB_REF_NAME}" in *-rc*) PRE="--prerelease" ;; esac
+          gh release create "${GITHUB_REF_NAME}" --title "${GITHUB_REF_NAME}" \
+             --notes-file notes.md $PRE
+
+      - name: Check out the branch that carries the index
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: pages
+          fetch-depth: 0
+
+      - name: Which index does this tag belong in?
+        run: |
+          case "${GITHUB_REF_NAME}" in
+            *-rc*) INDEX=package_drazzy.com_ATTinyCore_rc_index.json ;;
+            *)     INDEX=package_drazzy.com_ATTinyCore_index.json ;;
+          esac
+          echo "INDEX_FILE=$INDEX" >> "$GITHUB_ENV"
+          echo "This tag goes into ${INDEX}"
+
+      - name: Create the candidate index if there is none yet
+        working-directory: pages
+        run: |
+          # The first candidate would otherwise fail on a file that nobody has
+          # created. A copy of the released index is the right starting point:
+          # it carries the tools and lets a tester go back to a final version.
+          if [ ! -f "$INDEX_FILE" ]; then
+            cp package_drazzy.com_ATTinyCore_index.json "$INDEX_FILE"
+            echo "created ${INDEX_FILE} from the released index"
+          fi
+
+      - name: Add this version to the board manager index
+        working-directory: pages
+        run: |
+          sleep 20          # give the release a moment to become visible to the API
+          bash Boards_manager_release.sh "${GITHUB_REF_NAME}"
+
+      - name: Commit and push the index
+        working-directory: pages
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "The index already knew about this version"
+            exit 0
+          fi
+          git commit -m "${GITHUB_REF_NAME}"
+          git push

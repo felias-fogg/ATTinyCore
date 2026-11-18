@@ -1,6 +1,12 @@
 # This document lists significant changes and bugfixes, including those not in yet in a release.
 Any changes listed at the top, without a version number above them, have not been in a release yet, but can be downloaded from GitHub for manual installation.
 
+### 1.5.8
+
+* The debug tools now come from the AvrDebugger package, which has to be installed in addition; the core no longer installs its own copy (avrocd-tools).
+* The GDB server is started with `--arduino-ide` and with long option names.
+* When AvrDebugger is missing, clicking `Debug` brings up the gdb-server terminal, which says what to install. The stubs that do this are in `debugger/fallback/bin`, from AvrDebugger 0.1.1.
+
 ### 1.5.7
 
 * Deprecation notice added.
