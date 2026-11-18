@@ -8,99 +8,95 @@
 ##                                                      ##
 ##########################################################
 
-# Change these to match your repo
-VERSION=$1
-PAOOWNER=felias-fogg  # Github owner of PyAvrOCD  
-AUTHOR=felias-fogg        # Github user name
-REALAUTHOR=felias-fogg    # real author
-REPOSITORY=ATTinyCore # Github repo name
+# Called by the release workflow of the classic-debug-enabled branch with the tag,
+# e.g. "bash Boards_manager_release.sh v1.5.8"; by hand as well.
 
-if [ "x${VERSION}" == "x" ]; then
-    echo "You need to specify a version"
-    exit 1
-fi
+AUTHOR=felias-fogg       # Github user name
+REPOSITORY=ATTinyCore    # Github repo name
 
+# Which index to write. The workflow sets INDEX_FILE: a release candidate goes
+# into an index of its own, so the board manager of an ordinary user never
+# offers it. Without the variable, this is the stable index, the one the README
+# names.
+INDEX="${INDEX_FILE:-package_drazzy.com_${REPOSITORY}_index.json}"
+
+# The tools the platform depends on, as in the 1.5.x entries. The debug tools are
+# no dependency any more since 1.5.8: they come from the AvrDebugger package,
+# which the user installs separately and the platform finds as
+# runtime.tools.avr-debugger.path.
 AVRDUDE_VERSION="8.0-arduino.1"
+MICRONUCLEUS_VERSION="2.5-azd1b"
 
-# Get the version number of most recent PyAvrOCD version
-PAOVERSION=$(curl -s https://api.github.com/repos/$PAOOWNER/PyAvrOCD/releases/latest | grep "tag_name" |  awk -F\" '{print $4}')
-AVROCDVERSION=${PAOVERSION#"v"}
-
-# Get the download URL for the latest release from Github
-DOWNLOAD_URL=$(curl -s https://api.github.com/repos/$AUTHOR/$REPOSITORY/releases/tags/${VERSION} | grep "tarball_url" | awk -F\" '{print $4}')
-
-if [ "x${DOWNLOAD_URL}" == "x" ]; then
-    echo "Version '${VERSION}' does not exist"
+TAG="$1"
+if [ -z "$TAG" ]; then
+    echo "You need to specify a tag, e.g. v1.5.8"
     exit 1
 fi
+DOWNLOAD_URL="https://api.github.com/repos/$AUTHOR/$REPOSITORY/tarball/$TAG"
+DOWNLOADED_FILE="$TAG"
+NAME="$REPOSITORY-${TAG#"v"}"
+echo "Packaging ${TAG} into ${INDEX}"
 
-# Get filename
-DOWNLOADED_FILE=$(echo $DOWNLOAD_URL | awk -F/ '{print $8}')
-
-# Check whether most recent board file is already in the index
-if grep -q ${REPOSITORY}-${DOWNLOADED_FILE#"v"} package_${REALAUTHOR}_${REPOSITORY}_index.json; then
-    echo "Most recent board version is already in the index file. Nothing to do."
+# Check whether this exact version is already in the index. The archive name has
+# to be matched in full: without the extension, "ATTinyCore-1.5.8" also matches
+# "ATTinyCore-1.5.8-rc1.tar.bz2", and the final release would be refused because
+# one of its own release candidates is in the index.
+if grep -q "\"${NAME}.tar.bz2\"" "$INDEX"; then
+    echo "This version is already in the index file. Nothing to do."
     exit 1
 fi
-
-# Check whether already part of the index
-if grep -q "avrocd-tools-"${AVROCDVERSION} package_${REALAUTHOR}_${REPOSITORY}_index.json; then
-    echo "Current PyAvrOCD version is in index. Continue ..."
-else
-    echo "Current PyAvrOCD version is not in index. Add it first."
-    exit 1
-fi
-
 
 # Download file
-wget --no-verbose $DOWNLOAD_URL
-
-# Add .tar.bz2 extension to downloaded file
-mv $DOWNLOADED_FILE ${DOWNLOADED_FILE}.tar.bz2
+wget --no-verbose -O "${DOWNLOADED_FILE}.tar.gz" "$DOWNLOAD_URL" || exit 1
 
 # Extract downloaded file and place it in a folder
-printf "\nExtracting folder ${DOWNLOADED_FILE}.tar.bz2 to $REPOSITORY-${DOWNLOADED_FILE#"v"}\n"
-mkdir -p "$REPOSITORY-${DOWNLOADED_FILE#"v"}" && tar -xzf ${DOWNLOADED_FILE}.tar.bz2 -C "$REPOSITORY-${DOWNLOADED_FILE#"v"}" --strip-components=1
-printf "Done!\n"
+printf "\nExtracting ${DOWNLOADED_FILE}.tar.gz to ${NAME}\n"
+mkdir -p "$NAME" && tar -xzf "${DOWNLOADED_FILE}.tar.gz" -C "$NAME" --strip-components=1 || exit 1
 
-# Move files out of the avr folder
-mv $REPOSITORY-${DOWNLOADED_FILE#"v"}/avr/* $REPOSITORY-${DOWNLOADED_FILE#"v"}
+# The platform is the avr folder of the repository: keep only that
+mv "$NAME" "$NAME.full" && mv "$NAME.full/avr" "$NAME" && rm -rf "$NAME.full" "${DOWNLOADED_FILE}.tar.gz"
+test -f "$NAME/platform.txt" || { echo "no platform.txt in the avr folder of ${TAG}"; exit 1; }
 
-# Delete downloaded file and empty avr folder
-rm -rf ${DOWNLOADED_FILE}.tar.bz2 $REPOSITORY-${DOWNLOADED_FILE#"v"}/avr
-
-# Make sure there are no macOS related files added to the arching that's soon to be geneated
-dot_clean .
+# Make sure there are no macOS related files added to the archive that's soon to be
+# generated. dot_clean only exists on macOS; elsewhere there is nothing to clean.
+if command -v dot_clean > /dev/null 2>&1; then
+    dot_clean "$NAME"
+fi
+find "$NAME" -name "._*" -delete 2>/dev/null
 
 # Compress folder to tar.bz2
-printf "\nCompressing folder $REPOSITORY-${DOWNLOADED_FILE#"v"} to $REPOSITORY-${DOWNLOADED_FILE#"v"}.tar.bz2\n"
-tar -cjSf $REPOSITORY-${DOWNLOADED_FILE#"v"}.tar.bz2 $REPOSITORY-${DOWNLOADED_FILE#"v"}
+printf "\nCompressing folder ${NAME} to ${NAME}.tar.bz2\n"
+tar -cjSf "${NAME}.tar.bz2" "$NAME"
 printf "Done!\n"
 
 # Get file size on bytes
-FILE_SIZE=$(wc -c "$REPOSITORY-${DOWNLOADED_FILE#"v"}.tar.bz2" | awk '{print $1}')
+FILE_SIZE=$(wc -c "${NAME}.tar.bz2" | awk '{print $1}')
 
-# Get SHA256 hash
-SHA256="SHA-256:$(shasum -a 256 "$REPOSITORY-${DOWNLOADED_FILE#"v"}.tar.bz2" | awk '{print $1}')"
+# Get SHA256 hash: shasum is a macOS thing, sha256sum a Linux one
+if command -v shasum > /dev/null 2>&1; then
+    SHA256="SHA-256:$(shasum -a 256 "${NAME}.tar.bz2" | awk '{print $1}')"
+else
+    SHA256="SHA-256:$(sha256sum "${NAME}.tar.bz2" | awk '{print $1}')"
+fi
 
-# Create Github download URL
-URL="https://${AUTHOR}.github.io/${REPOSITORY}/$REPOSITORY-${DOWNLOADED_FILE#"v"}.tar.bz2"
+# The archive is served from this branch (gh-pages). Up to 1.5.7 the archives were
+# put into the user site felias-fogg.github.io instead; those entries keep their URLs.
+URL="https://${AUTHOR}.github.io/${REPOSITORY}/${NAME}.tar.bz2"
 
-cp "package_${REALAUTHOR}_${REPOSITORY}_index.json" "package_${REALAUTHOR}_${REPOSITORY}_index.json.tmp"
+cp "$INDEX" "$INDEX.tmp"
 
 # Add new boards release entry
-jq -r                                    \
---arg avrocdversion $AVROCDVERSION       \
---arg repository  $REPOSITORY            \
---arg version     ${DOWNLOADED_FILE#"v"} \
---arg url         $URL                   \
---arg checksum    $SHA256                \
---arg file_size   $FILE_SIZE             \
---arg avrdude_ver $AVRDUDE_VERSION       \
---arg file_name   $REPOSITORY-${DOWNLOADED_FILE#"v"}.tar.bz2  \
+jq -r                                          \
+--arg version          "${TAG#"v"}"            \
+--arg url              "$URL"                  \
+--arg checksum         "$SHA256"               \
+--arg file_size        "$FILE_SIZE"            \
+--arg avrdude_ver      "$AVRDUDE_VERSION"      \
+--arg micronucleus_ver "$MICRONUCLEUS_VERSION" \
+--arg file_name        "${NAME}.tar.bz2"       \
 '.packages[].platforms[.packages[].platforms | length] |= . +
 {
-  "name": $repository,
+  "name": "ATTinyCore (debug-configured)",
   "architecture": "avr",
   "version": $version,
   "category": "Contributed",
@@ -109,7 +105,16 @@ jq -r                                    \
   "checksum": $checksum,
   "size": $file_size,
   "boards": [
-    {"name": "Classic ATtinys"}
+    {"name": "Program and debug via ISP/dw or Serial:"},
+    {"name": "ATtiny841/441, ATtiny85/45/25, ATtiny43U"},
+    {"name": "ATtiny84/44/24, ATtiny1634, ATtiny828"},
+    {"name": "ATtiny861/461/261, ATtiny167/87"},
+    {"name": "ATtiny88/48, ATtiny4313/2313"},
+    {"name": "USB (Micronucleus) boards:"},
+    {"name": "DigiSpark (t85), Digispark Pro (t167)"},
+    {"name": "Wattuino Nano (t841), CaliforniaSTEAM (t84)"},
+    {"name": "AzduinoUSB (t84, t841, t861, t1634)"},
+    {"name": "If Win USB drivers not already installed, run the post_install.bat manually or DL from https://azduino.com/bin/micronucleus"}
   ],
   "toolsDependencies": [
     {
@@ -123,18 +128,12 @@ jq -r                                    \
       "version": $avrdude_ver
     },
     {
-      "packager": "arduino",
-      "name": "arduinoOTA",
-      "version": "1.3.0"
-    },
-    {
       "packager": "ATTinyCore",
-      "name": "avrocd-tools",
-      "version": $avrocdversion
-    }   
+      "name": "micronucleus",
+      "version": $micronucleus_ver
+    }
   ]
-}' "package_${REALAUTHOR}_${REPOSITORY}_index.json.tmp" > "package_${REALAUTHOR}_${REPOSITORY}_index.json"
+}' "$INDEX.tmp" > "$INDEX" || { mv "$INDEX.tmp" "$INDEX"; echo "jq failed, index unchanged"; exit 1; }
 
-# Remove files that's no longer needed
-rm -rf "$REPOSITORY-${DOWNLOADED_FILE#"v"}" "package_${REALAUTHOR}_${REPOSITORY}_index.json.tmp"
-
+# Remove files that are no longer needed (the archive stays: it is what the URL serves)
+rm -rf "$NAME" "$INDEX.tmp"
